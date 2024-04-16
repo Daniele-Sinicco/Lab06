@@ -7,6 +7,7 @@ class Controller:
         self._view = view
         # the model, which implements the logic of the program and holds the data
         self._model = model
+        self._retailer = None
 
     def handle_hello(self, e):
         name = self._view.txt_name.value
@@ -15,3 +16,24 @@ class Controller:
             return
         self._view.txt_result.controls.append(ft.Text(f"Hello, {name}!"))
         self._view.update_page()
+
+    def load_dd_anno(self):
+        anni = self._model.get_anni()
+        for a in anni:
+            self._view.dd_anno.options.append(ft.dropdown.Option(key=a, text=str(a)))
+        self._view.update_page()
+
+    def load_dd_brand(self):
+        brand = self._model.get_brand()
+        for b in brand:
+            self._view.dd_brand.options.append(ft.dropdown.Option(key=b, text=str(b)))
+        self._view.update_page()
+
+    def load_dd_retailer(self):
+        retailer = self._model.get_retailer()
+        for r in retailer:
+            self._view.dd_retailer.options.append(ft.dropdown.Option(key=r.code, text=r.name, data=retailer, on_click=self.read_retailer))
+        self._view.update_page()
+
+    def read_retailer(self, e):
+        self._retailer = e.control.data
