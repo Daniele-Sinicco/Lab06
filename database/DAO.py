@@ -1,5 +1,6 @@
 from database.DB_connect import DBConnect
 from model.retailer import Retailer
+from model.vendite import Vendite
 
 
 class DAO():
@@ -50,3 +51,25 @@ class DAO():
         cursor.close()
         cnx.close()
         return result
+
+    def get_top_vendite_dao(self, anno, brand, retailer):
+        cnx = DBConnect.get_connection()
+        cursor = cnx.cursor(dictionary=True)
+        query = """select * from go_daily_sales where year (Date) = coalesce(%s, year(Date)) and 
+        Retailer_code = coalesce(%s, Retailer_code) and
+         Product_number in (select Product_number from go_products where Product_brand = coalesce(%s, Product_brand))"""
+        cursor.execute(query, (anno, retailer, brand))
+        vendite = []
+        result = []
+        for row in cursor:
+            vendite.append(Vendite(row['Date'], (row['Quantity']*row['Unit_sale_price']), row['Retailer_code'], row['Product_number']))
+        vendite.sort(reverse=True)
+        if len(vendite) >= 5:
+            result = vendite[:5]
+        else:
+            result = vendite[:len(vendite)]
+        cursor.close()
+        cnx.close()
+        return result
+
+

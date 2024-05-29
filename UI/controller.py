@@ -37,3 +37,21 @@ class Controller:
 
     def read_retailer(self, e):
         self._retailer = e.control.data
+
+    def handle_top_vendite(self, e):
+        self._view.txt_result.clean()
+        anno = self._view.dd_anno.value
+        if anno == "Nessun filtro":
+            anno = None
+        brand = self._view.dd_brand.value
+        if brand == "Nessun filtro":
+            brand = None
+        retailer = self._view.dd_retailer.value
+        if retailer == "Nessun filtro":
+            retailer = None
+        vendite = self._model.get_top_vendite(anno, brand, retailer)
+        if len(vendite) == 0:
+            self._view.txt_result.controls.append(ft.Text("Nessuna vendita"))
+        for v in vendite:
+            self._view.txt_result.controls.append(ft.Text(v))
+        self._view.update_page()
